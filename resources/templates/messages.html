@@ -1,9 +1,22 @@
 <html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="CSS.html">
+</head>
+
 <body>
-<form action="/messages", method="post"/>
-<input type="text" placeholder="Write a message" name="message"/>
-<button type="submit">Submit</button>
+<div id="messageHeader">
+    <form action="/create-message",  method="post"/>
+    <input type="text" placeholder="Write a message" name="message"/>
+    <button type="submit">Submit</button>
+    </form>
+</div>
+
 <p>Messages by {{name}}:</p>
-<p>{{orderedList}}</p>
+<br>
+{{#allMessages}}
+{{id}}. {{text}}<br>
+{{/allMessages}}
+
 </body>
 </html>

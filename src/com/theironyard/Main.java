@@ -4,14 +4,17 @@ import spark.ModelAndView;
 import spark.Spark;
 import spark.template.mustache.MustacheTemplateEngine;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Main {
 
     static User user;
 
+
     public static void main(String[] args) {
         Spark.init();
+        ArrayList<Messages> allMessages = new ArrayList<>();
 
         Spark.get(
                 "/",
@@ -21,6 +24,7 @@ public class Main {
                         return new ModelAndView(m, "index.html");
                     } else {
                         m.put("name", user.name);
+                        m.put("allMessages", allMessages);
                         return new ModelAndView(m, "messages.html");
                     }
                 }),
@@ -40,8 +44,10 @@ public class Main {
         Spark.post(
                 "/create-message",
                 ((request, response) -> {
-                    String name = request.queryParams("message");
-                    user = new User(name);
+                    String text = request.queryParams("message");
+                    Messages messages = new Messages(text);
+                    messages.id = allMessages.size() + 1;
+                    allMessages.add(messages);
                     response.redirect("/");
                     return "";
                 })
