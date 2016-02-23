@@ -4,6 +4,8 @@ import spark.ModelAndView;
 import spark.Session;
 import spark.Spark;
 import spark.template.mustache.MustacheTemplateEngine;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Main {
@@ -12,6 +14,9 @@ public class Main {
 
     public static void main(String[] args) {
         Spark.init();
+        User kevin = new User("Kevin", "asdf");
+        users.put(kevin.name, kevin);
+
         Spark.get(
                 "/",
                 ((request, response) -> {
@@ -30,15 +35,20 @@ public class Main {
         Spark.post(
                 "/create-user",
                 ((request, response) -> {
-                    String name = request.queryParams("loginName");
-                    User user = users.get(name);
-                    if (user == null) {
-                        user = new User(name);
-                        users.put(name, user);
-                    }
-
                     Session session = request.session();
-                    session.attribute("userName", name);
+                    String name = request.queryParams("loginName");
+                    String password = request.queryParams("loginPassword");
+                    //User user = users.get(name);
+                    if (!users.containsKey(name)) {
+                       User user = new User(name, password);
+                        users.put(name, user);
+                        session.attribute("userName", name);
+                    } else {
+                        User user = users.get(name);
+                        if (user.password.equals(password)) {
+                            session.attribute("userName", name);
+                        }
+                    }
 
                     response.redirect("/");
                     return "";
@@ -55,12 +65,41 @@ public class Main {
 
                     String text = request.queryParams("message");
                     Messages messages = new Messages(text);
-                    messages.id = user.allMessages.size() + 1;
 
                     user.allMessages.add(messages);
 
                     response.redirect("/");
 
+                    return "";
+                })
+        );
+
+        Spark.post(
+                "/delete-message",
+                ((request, response) -> {
+                    int index = Integer.valueOf(request.queryParams("selectMessage"));
+                    Session session = request.session();
+                    String name = session.attribute("userName");
+                    User user = users.get(name);
+                    user.allMessages.remove(index - 1);
+                    response.redirect("/");
+                    return "";
+                })
+        );
+
+        Spark.post(
+                "/edit-message",
+                ((request, response) -> {
+                    int index = Integer.valueOf(request.queryParams("selectMessage"));
+                    Session session = request.session();
+                    String name = session.attribute("userName");
+                    User user = users.get(name);
+
+                    String newMessage = request.queryParams("editMessage");
+
+                    user.allMessages.get(index -1).text = newMessage;
+
+                    response.redirect("/");
                     return "";
                 })
         );
@@ -74,7 +113,20 @@ public class Main {
                     return "";
                 })
         );
-    }
+
+
+
+
+
+
+
+
+        //class name, object name = constructor method;
+
+
+
+
+    }//end main method
 
     static User getUserFromSession(Session session) {
         String name = session.attribute("userName");

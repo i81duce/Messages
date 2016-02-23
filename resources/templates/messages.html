@@ -16,17 +16,19 @@
 </form>
 
 <form action="/edit-message"  method="post"/>
-    <input type="number" placeholder="Message #" name="message"/>
-    <input type="text" placeholder="Edit message" name="message"/>
+    <input type="number" placeholder="Message #" name="selectMessage"/>
+    <input type="text" placeholder="Edit message" name="editMessage"/>
     <button type="submit">Edit</button>
 </form>
 
 
 <p><b>Messages by {{name}}:</b></p>
 <br/>
+<ol>
 {{#allMessages}}
-{{id}}. {{text}}<br/>
+<li>{{text}}</li>
 {{/allMessages}}
+</ol>
 
 </body>
 </html>
